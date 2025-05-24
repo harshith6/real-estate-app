@@ -62,7 +62,9 @@ const AddProperty = () => {
         price: '',
         location: '',
         userId: user.id || '', // Reset to current user ID
+
       });
+      setImages([]); // Redirect to property list after successful submission
     } catch (error) {
       console.error('Failed to create property', error);
        setMessage('Failed tocreate property');
@@ -70,9 +72,7 @@ const AddProperty = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4">Add New Property</h2>
-      {message && <p className="text-center mb-2">{message}</p>}
+    <div className="max-w-md mt-10 bg-white p-6 shadow rounded-lg">
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
@@ -116,12 +116,15 @@ const AddProperty = () => {
           onChange={handleImageChange}
           className="w-full"
         />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Add Property
-        </button>
+         {message && <p className="text-center mb-2">{message}</p>}
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          >
+            Submit Property
+          </button>
+        </div>
       </form>
     </div>
   );

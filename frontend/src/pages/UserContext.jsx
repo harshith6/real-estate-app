@@ -8,6 +8,7 @@ export const UserProvider = ({ children }) => {
     // Try to load user from localStorage on first render
     id: null,
     email: null,
+    name: null,
   });
 
   return (

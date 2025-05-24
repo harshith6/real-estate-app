@@ -72,9 +72,7 @@ const AddOwner = () => {
     };
 
   return (
-    <div className="max-w-md mx-auto mt-10 bg-white p-6 shadow rounded-lg">
-      <h2 className="text-2xl font-semibold mb-4 text-center">Add Owner</h2>
-      {message && <p className="text-center mb-2">{message}</p>}
+    <div className="max-w-md mt-10 bg-white p-6 shadow rounded-lg">
       <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-4">
         <input
           type="text"
@@ -125,11 +123,12 @@ const AddOwner = () => {
         onChange={handleChange}
         className="w-full p-2 border rounded"
         />
+        {message && <p className="text-center mb-2">{message}</p>}
         <button
           type="submit"
           className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
         >
-          Add Owner
+          Submit Owner
         </button>
       </form>
     </div>

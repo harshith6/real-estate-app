@@ -1,71 +1,36 @@
 // src/pages/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 import Profile from './Profile'; // Adjust the import path as necessary
+import { UserContext } from './UserContext'; // Adjust the import path as necessary
+import { useContext } from 'react'; // Adjust the import path as necessary
+import Tabs from './Tabs'; // Adjust the import path as necessary
 
 const Dashboard = () => {
-  const [properties, setProperties] = useState([]);
-  const [filters, setFilters] = useState({ location: '', minPrice: '', maxPrice: '' });
+  
   const navigate = useNavigate();
   const [showProfile, setShowProfile] = useState(false);
+  const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
-    } else {
-      fetchProperties();
     }
-  }, [filters]);
-
-  const fetchProperties = async () => {
-    try {
-        const token = localStorage.getItem('token');
-        const query = new URLSearchParams();
-        if (filters.location) query.append('location', filters.location);
-        if (filters.minPrice) query.append('minPrice', filters.minPrice);
-        if (filters.maxPrice) query.append('maxPrice', filters.maxPrice);
-    
-        const response = await axios.get(`http://localhost:5000/api/property?${query.toString()}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        console.log('Fetched properties:', response.data);
-        // Make sure we're setting the properties array from the response
-        setProperties(response.data.properties || []);
-    } catch (error) {
-        console.error('Error fetching properties:', error);
-        if (error.response?.status === 401) {
-          navigate('/login');
-        }
-    }
-  };
-
-  const handleFilterChange = (e) => {
-    setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    // If you store user/email, clear them too:
-    localStorage.removeItem('email');
-    // Optionally clear other user info/context here
+    setUser(null); // Clear user context
     navigate('/login');
   };
 
   return (
-    <div className="p-4 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Property Listings</h1>
-      {/* <Link to="/profile" className="text-blue-600 underline ml-auto">
-        Go to Admin/Profile Page
-        </Link> */}
-
-       <div className="flex justify-between items-center mb-4">
+    <div className="sticky top-0 z-10 p-4 max-w-7xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Welcome! <span>{user.name}</span></h1>
+      
+      {/* Sticky controls */}
+      <div className="sticky top-0 z-10 bg-white flex justify-between items-center mb-4 py-2 px-2 shadow">
         <button
           onClick={() => setShowProfile(!showProfile)}
           className="px-4 py-2 bg-blue-600 text-white rounded"
@@ -80,62 +45,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-
-
-        {showProfile ? (
-        <Profile />
-        ) : (
-        <div> {/* your dashboard property listing layout here */} 
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <input
-                type="text"
-                name="location"
-                placeholder="Location"
-                value={filters.location}
-                onChange={handleFilterChange}
-                className="p-2 border rounded"
-                />
-                <input
-                type="number"
-                name="minPrice"
-                placeholder="Min Price"
-                value={filters.minPrice}
-                onChange={handleFilterChange}
-                className="p-2 border rounded"
-                />
-                <input
-                type="number"
-                name="maxPrice"
-                placeholder="Max Price"
-                value={filters.maxPrice}
-                onChange={handleFilterChange}
-                className="p-2 border rounded"
-                />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.isArray(properties) && properties.length > 0 ? (
-                properties.map((property) => (
-                    <div key={property.id} className="border rounded shadow p-4">
-                    {property.images && property.images.length > 0 && (
-                        <img
-                        src={`http://localhost:5000/uploads/${property.images[0]}`}
-                        alt={property.title}
-                        className="w-full h-40 object-cover rounded mb-2"
-                        />
-                    )}
-                    <h2 className="text-lg font-semibold">{property.title}</h2>
-                    <p className="text-gray-600">{property.location}</p>
-                    <p className="text-blue-600 font-bold">₹ {property.price}</p>
-                    </div>
-                ))
-                ) : (
-                <p className="col-span-3 text-center text-gray-500">No properties found</p>
-                )}
-            </div>
-      </div>
-      )}
+      {showProfile ? (<Profile />) : (<Tabs />)}
     </div>
   );
 };
