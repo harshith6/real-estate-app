@@ -6,7 +6,9 @@ const path = require('path');
 const User = require('./models/User');
 const Property = require('./models/Property');
 const propertyRoutes = require('./routes/property');
+const Owners = require('./models/Owners'); // Import Owners model
 const bodyParser = require('body-parser');
+const ownersRoutes = require('./routes/owner'); // Import owners routes
 
 
 const app = express();
@@ -55,3 +57,4 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Use the routes
 app.use('/api/auth', authRoutes); // Auth routes (Register, Login)
 app.use('/api/property', propertyRoutes); // Property routes (Create, View properties)
+app.use('/api/owners', ownersRoutes); // Owners routes (Create, View owners)
