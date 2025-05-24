@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import api from '../api';
+import { useContext } from 'react';
+import { UserContext } from './UserContext'; // Adjust the import path as necessary
 
 const AddProperty = () => {
   const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     price: '',
     location: '',
+    userId: user.id || '', // Assuming user.id is available
+
   });
   const [images, setImages] = useState([]);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -39,23 +46,33 @@ const AddProperty = () => {
     images.forEach((file) => {
       data.append('images', file);
     });
+    data.append('userId', formData.userId);
 
     try {
-      await axios.post('/api/properties', data, {
+      await api.post('/property', data, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-      navigate('/dashboard');
+      setMessage('Property added successfully!');
+      setFormData({
+        title: '',
+        description: '',
+        price: '',
+        location: '',
+        userId: user.id || '', // Reset to current user ID
+      });
     } catch (error) {
       console.error('Failed to create property', error);
+       setMessage('Failed tocreate property');
     }
   };
 
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4">Add New Property</h2>
+      {message && <p className="text-center mb-2">{message}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"

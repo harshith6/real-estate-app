@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import AddProperty from '../pages/AddProperty';
+import AddOwner from './AddOwner';
 
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState('add');
+  const [activeTab, setActiveTab] = useState('add-properties');
 
   return (
     <div className="p-4 max-w-6xl mx-auto">
@@ -10,10 +11,16 @@ const Profile = () => {
 
       <div className="mb-4">
         <button
-          onClick={() => setActiveTab('add')}
-          className={`mr-4 px-4 py-2 rounded ${activeTab === 'add' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          onClick={() => setActiveTab('add-properties')}
+          className={`mr-4 px-4 py-2 rounded ${activeTab === 'add-properties' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
         >
           Add Property
+        </button>
+        <button
+          onClick={() => setActiveTab('add-owner')}
+          className={`mr-4 px-4 py-2 rounded ${activeTab === 'my-owner' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+        >
+          Add Owner
         </button>
         <button
           onClick={() => setActiveTab('my-properties')}
@@ -23,7 +30,8 @@ const Profile = () => {
         </button>
       </div>
 
-      {activeTab === 'add' && <AddProperty />}
+      {activeTab === 'add-properties' && <AddProperty />}
+      {activeTab === 'add-owner' && <AddOwner/>}
       {activeTab === 'my-properties' && <p>Coming soon: My Properties List</p>}
     </div>
   );

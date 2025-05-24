@@ -50,6 +50,14 @@ const Dashboard = () => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    // If you store user/email, clear them too:
+    localStorage.removeItem('email');
+    // Optionally clear other user info/context here
+    navigate('/login');
+  };
+
   return (
     <div className="p-4 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Property Listings</h1>
@@ -57,9 +65,22 @@ const Dashboard = () => {
         Go to Admin/Profile Page
         </Link> */}
 
-        <button onClick={() => setShowProfile(!showProfile)} className="mb-4 px-4 py-2 bg-blue-600 text-white rounded">
-        {showProfile ? 'Back to Listings' : 'Go to Admin/Profile'}
+       <div className="flex justify-between items-center mb-4">
+        <button
+          onClick={() => setShowProfile(!showProfile)}
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          {showProfile ? 'Back to Listings' : 'Go to Admin/Profile'}
         </button>
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 bg-red-600 text-white rounded ml-4"
+        >
+          Logout
+        </button>
+      </div>
+
+
 
         {showProfile ? (
         <Profile />

@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { useContext } from 'react';
+import { UserContext } from './UserContext';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,6 +34,7 @@ const Register = () => {
     try {
       const res = await api.post('/auth/register', data);
       localStorage.setItem('token', res.data.token);
+      
       // navigate('/dashboard'); // or '/login'
       alert('Registration successful!');
       setError('');

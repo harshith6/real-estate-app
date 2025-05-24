@@ -37,7 +37,7 @@ sequelize.authenticate()
 
 sequelize.sync()
 .then(() => {
-  console.log('✅ DB Synced');
+  console.log('DB Synced');
   // Then start your server
   app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);

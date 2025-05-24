@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { useContext } from 'react';
+import { UserContext } from './UserContext';
 
 const Login = () => {
+  const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,6 +18,11 @@ const Login = () => {
 
     //   Save token in localStorage
       localStorage.setItem('token', res.data.token);
+
+      setUser({
+        id: res.data.user.id,
+        email: res.data.user.email,
+      });
 
     //   Redirect to dashboard or property list
       navigate('/dashboard');
