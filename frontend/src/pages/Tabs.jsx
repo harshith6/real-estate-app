@@ -30,7 +30,7 @@ const Profile = () => {
     >
       <div className="flex justify-center w-full">
     
-        <div className="sticky top-0 z-20 w-full bg-white/90 rounded-xl shadow-lg border border-blue-100/50 backdrop-blur-lg border-b border-blue-100/50 shadow-sm mb-3 ">
+        <div className="sticky top-0 z-20 w-full bg-white/90 rounded-xl shadow-lg border border-blue-100/50 backdrop-blur-lg border-b mb-3 ">
           <div className="max-w-[2000px] mx-auto px-4 ">
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
