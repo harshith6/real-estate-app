@@ -21,12 +21,14 @@ services:
       interval: 2s
       timeout: 5s
       retries: 10
+    networks:
+      - real-estate-network
 
   frontend:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: real-estate-frontend-dev
+    container_name: real-estate-frontend
     ports:
       - "8081:80"   # HTTP
       - "8443:443"  # HTTPS
@@ -40,5 +42,9 @@ services:
     depends_on:
       ssl-generator:
         condition: service_healthy
-    # Uncomment below if you want to serve static files from a local folder
-    # - ./dist:/usr/share/nginx/html:ro
+    networks:
+      - real-estate-network
+    
+networks:
+  real-estate-network:
+    external: true
