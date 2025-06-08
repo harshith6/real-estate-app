@@ -1,0 +1,27 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: real-estate-frontend
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    # Uncomment below if you want to serve static files from a local folder
+    # - ./dist:/usr/share/nginx/html:ro
+
+# If you want to add backend service, you can add it here as well
+#  backend:
+#    build:
+#      context: ./backend
+#      dockerfile: Dockerfile
+#    ports:
+#      - "5000:5000"
+#    environment:
+#      - NODE_ENV=production
+#    depends_on:
+#      - frontend
