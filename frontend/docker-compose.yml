@@ -3,16 +3,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: real-estate-frontend
+    container_name: real-estate-frontend-prod
     ports:
-      - "8081:80"
+      - "80:80"   # HTTP - needed for Let's Encrypt validation
+      - "443:443" # HTTPS
     restart: unless-stopped
     environment:
       - NODE_ENV=production
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    # Uncomment below if you want to serve static files from a local folder
-    # - ./dist:/usr/share/nginx/html:ro
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: real-estate-certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 # If you want to add backend service, you can add it here as well
 #  backend:

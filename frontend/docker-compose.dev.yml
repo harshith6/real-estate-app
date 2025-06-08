@@ -1,0 +1,44 @@
+services:
+  ssl-generator:
+    image: alpine:latest
+    container_name: ssl-generator
+    stop_grace_period: 1s
+    volumes:
+      - ./ssl:/ssl
+    command: >
+      sh -c 'apk add --no-cache openssl &&
+      if [ ! -f /ssl/certificate.crt ] || [ ! -f /ssl/private.key ]; then
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /ssl/private.key -out /ssl/certificate.crt -subj "/C=US/ST=State/L=City/O=Development/CN=localhost" &&
+        chmod 644 /ssl/certificate.crt &&
+        chmod 600 /ssl/private.key &&
+        echo "SSL certificates generated successfully!"
+      else
+        echo "SSL certificates already exist, skipping generation."
+      fi &&
+      while true; do sleep 3600; done'
+    healthcheck:
+      test: ["CMD", "test", "-f", "/ssl/certificate.crt"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: real-estate-frontend-dev
+    ports:
+      - "8081:80"   # HTTP
+      - "8443:443"  # HTTPS
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/app:ro
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      ssl-generator:
+        condition: service_healthy
+    # Uncomment below if you want to serve static files from a local folder
+    # - ./dist:/usr/share/nginx/html:ro

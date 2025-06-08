@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  ssl-generator:
+    image: alpine:latest
+    container_name: ssl-generator-prod    
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+      - EMAIL=${EMAIL:-admin@example.com}
+      - SSL_RENEWAL_INTERVAL=${SSL_RENEWAL_INTERVAL:-12h}
+    command: >
+      sh -c '
+      mkdir -p "/etc/letsencrypt/live/$${DOMAIN}" &&
+      mkdir -p /var/www/certbot &&
+      if [ ! -f "/etc/letsencrypt/live/$${DOMAIN}/fullchain.pem" ]; then
+        apk add --no-cache certbot openssl &&
+        openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
+          -keyout "/etc/letsencrypt/live/$${DOMAIN}/privkey.pem" \
+          -out "/etc/letsencrypt/live/$${DOMAIN}/fullchain.pem" \
+          -subj "/C=US/ST=State/L=City/O=Organization/CN=$${DOMAIN}" &&
+        certbot certonly --webroot -w /var/www/certbot \
+          --email "$${EMAIL}" \
+          -d "$${DOMAIN}" \
+          --rsa-key-size 4096 \
+          --agree-tos \
+          --force-renewal \
+          --non-interactive || true &&
+        chmod -R 755 /etc/letsencrypt/live &&
+        chmod -R 755 /var/www/certbot &&
+        echo "Certificates generated successfully!"
+      else
+        echo "Certificates already exist, starting renewal service"
+      fi &&
+      while true; do
+        certbot renew --non-interactive || true;
+        sleep 12h;      done'
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /etc/letsencrypt/live/$${DOMAIN}/fullchain.pem"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: real-estate-frontend-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - DOMAIN=${DOMAIN:-localhost}
+      - SSL_RENEWAL_INTERVAL=${SSL_RENEWAL_INTERVAL:-12h}
+      - NGINX_RELOAD_INTERVAL=${NGINX_RELOAD_INTERVAL:-6h}    
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./data/certbot/conf:/etc/letsencrypt:ro
+      - ./data/certbot/www:/var/www/certbot:ro
+      - ./dist:/usr/share/nginx/html:ro
+    depends_on:
+      ssl-generator:
+        condition: service_healthy
+    command: >
+      sh -c '
+      while ! test -f "/etc/letsencrypt/live/$${DOMAIN}/fullchain.pem"; do
+        echo "Waiting for SSL certificates...";
+        sleep 2;
+      done &&
+      echo "Starting Nginx..." &&
+      while :; do
+        sleep $${NGINX_RELOAD_INTERVAL} & wait $${!};
+        nginx -s reload;
+      done & nginx -g "daemon off;"'
