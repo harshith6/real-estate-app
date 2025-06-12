@@ -110,7 +110,7 @@ const Register = () => {
               required
             />
           </div>
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label 
               htmlFor="profile-picture" 
               className="block text-sm font-medium text-gray-700"
@@ -125,7 +125,7 @@ const Register = () => {
               onChange={handleChange}
               accept="image/*"
             />
-          </div>
+          </div> */}
           <button
             type="submit"
             disabled={loading}
