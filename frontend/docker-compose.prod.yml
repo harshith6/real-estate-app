@@ -20,9 +20,6 @@ services:
       -  /etc/letsencrypt/live/yourdomain.com:/etc/letsencrypt/live/yourdomain.com:ro
       -  /etc/letsencrypt/archive/yourdomain.com:/etc/letsencrypt/archive/yourdomain.com:ro
       - ./dist:/usr/share/nginx/html:ro
-    depends_on:
-      ssl-generator:
-        condition: service_healthy
     command: ["nginx", "-g", "daemon off;"]
     networks:
       - real-estate-network
