@@ -2,44 +2,44 @@ version: '3.8'
 
 services:
   ssl-generator:
-  image: certbot/certbot:latest  # instead of alpine:latest
-  container_name: ssl-generator-prod
-  volumes:
-    - ./data/certbot/conf:/etc/letsencrypt
-    - ./data/certbot/www:/var/www/certbot
-  environment:
-    - DOMAIN=${DOMAIN:-localhost}
-    - SSL_RENEWAL_INTERVAL=${SSL_RENEWAL_INTERVAL:-12h}
-  command: >
-    sh -c '
-    mkdir -p "/etc/letsencrypt/live/$${DOMAIN}" &&
-    mkdir -p /var/www/certbot &&
-    if [ ! -f "/etc/letsencrypt/live/$${DOMAIN}/fullchain.pem" ]; then
-      certbot certonly --webroot -w /var/www/certbot \
-        --register-unsafely-without-email \
-        -d "$${DOMAIN}" \
-        --rsa-key-size 4096 \
-        --agree-tos \
-        --force-renewal \
-        --non-interactive || true &&
-      chmod -R 755 /etc/letsencrypt/live &&
-      chmod -R 755 /var/www/certbot &&
-      echo "Certificates generated successfully!"
-    else
-      echo "Certificates already exist, starting renewal service"
-    fi &&
-    while true; do
-      certbot renew --non-interactive || true;
-      sleep $${SSL_RENEWAL_INTERVAL};
-    done'
-  restart: unless-stopped
-  healthcheck:
-    test: ["CMD-SHELL", "test -f /etc/letsencrypt/live/$${DOMAIN}/fullchain.pem"]
-    interval: 10s
-    timeout: 5s
-    retries: 10
-    networks:
-      - real-estate-network
+    image: certbot/certbot:latest  # instead of alpine:latest
+    container_name: ssl-generator-prod
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+      - SSL_RENEWAL_INTERVAL=${SSL_RENEWAL_INTERVAL:-12h}
+    command: >
+      sh -c '
+      mkdir -p "/etc/letsencrypt/live/$${DOMAIN}" &&
+      mkdir -p /var/www/certbot &&
+      if [ ! -f "/etc/letsencrypt/live/$${DOMAIN}/fullchain.pem" ]; then
+        certbot certonly --webroot -w /var/www/certbot \
+          --register-unsafely-without-email \
+          -d "$${DOMAIN}" \
+          --rsa-key-size 4096 \
+          --agree-tos \
+          --force-renewal \
+          --non-interactive || true &&
+        chmod -R 755 /etc/letsencrypt/live &&
+        chmod -R 755 /var/www/certbot &&
+        echo "Certificates generated successfully!"
+      else
+        echo "Certificates already exist, starting renewal service"
+      fi &&
+      while true; do
+        certbot renew --non-interactive || true;
+        sleep $${SSL_RENEWAL_INTERVAL};
+      done'
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /etc/letsencrypt/live/$${DOMAIN}/fullchain.pem"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      networks:
+        - real-estate-network
 
   frontend:
     build:
