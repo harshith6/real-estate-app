@@ -17,8 +17,8 @@ services:
       - NGINX_RELOAD_INTERVAL=${NGINX_RELOAD_INTERVAL:-6h}    
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      -  /etc/letsencrypt/live/yourdomain.com:/etc/letsencrypt/live/yourdomain.com:ro
-      -  /etc/letsencrypt/archive/yourdomain.com:/etc/letsencrypt/archive/yourdomain.com:ro
+      -  /etc/letsencrypt/live/jaimaruthiestate.in:/etc/letsencrypt/live/jaimaruthiestate.in:ro
+      - /etc/letsencrypt/archive/jaimaruthiestate.in:/etc/letsencrypt/archive/jaimaruthiestate.in:ro
       - ./dist:/usr/share/nginx/html:ro
     command: ["nginx", "-g", "daemon off;"]
     networks:
