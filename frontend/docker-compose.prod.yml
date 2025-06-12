@@ -38,7 +38,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      networks:
+    networks:
         - real-estate-network
 
   frontend:
