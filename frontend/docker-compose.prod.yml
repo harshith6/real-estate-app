@@ -43,6 +43,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - real-estate-network
 
   frontend:
     build:
@@ -76,3 +78,9 @@ services:
         sleep $${NGINX_RELOAD_INTERVAL} & wait $${!};
         nginx -s reload;
       done & nginx -g "daemon off;"'
+    networks:
+      - real-estate-network
+
+networks:
+  real-estate-network:
+    external: true
